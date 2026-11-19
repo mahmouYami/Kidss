@@ -1,0 +1,1154 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>حضانة النجوم الصغار | العب وتعلم</title>
+
+  <!-- خط القاهرة العصري من Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@500;600;700;800;900&display=swap" rel="stylesheet" />
+
+  <!-- مكتبة Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- مكتبة المفرقعات الاحتفالية Canvas Confetti -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+
+  <!-- إعداد ألوان وخطوط Tailwind -->
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            cairo: ['Cairo', 'sans-serif'],
+          },
+          colors: {
+            cream: '#FDFBF7',
+            coral: '#FF6B6B',
+            sunny: '#FFD93D',
+            mint: '#2EC4B6',
+            skyplay: '#4D96FF',
+            softpurple: '#845EC2',
+          },
+        },
+      },
+    };
+  </script>
+
+  <!-- تنسيقات وحركات مخصصة لتعزيز تجربة المستخدم والأطفال -->
+  <style>
+    body {
+      font-family: 'Cairo', sans-serif;
+      background-color: #FDFBF7;
+      color: #2D3142;
+      overflow-x: hidden;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+    }
+
+    /* أزرار ثلاثية الأبعاد قابلة للضغط بأسلوب تفاعلي (Duolingo-style) */
+    .btn-3d {
+      transition: transform 0.12s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.12s ease, filter 0.15s ease;
+    }
+    .btn-3d:hover:not(:disabled) {
+      filter: brightness(1.03);
+      transform: translateY(-2px);
+    }
+    .btn-3d:active:not(:disabled) {
+      transform: translateY(4px) !important;
+      box-shadow: 0 1px 0 0 var(--btn-shadow, #cbd5e1) !important;
+    }
+
+    .btn-3d-coral {
+      --btn-shadow: #d94848;
+      box-shadow: 0 6px 0 0 var(--btn-shadow);
+    }
+    .btn-3d-mint {
+      --btn-shadow: #1e968a;
+      box-shadow: 0 6px 0 0 var(--btn-shadow);
+    }
+    .btn-3d-sky {
+      --btn-shadow: #2b6fd6;
+      box-shadow: 0 6px 0 0 var(--btn-shadow);
+    }
+    .btn-3d-purple {
+      --btn-shadow: #633da1;
+      box-shadow: 0 6px 0 0 var(--btn-shadow);
+    }
+    .btn-3d-sunny {
+      --btn-shadow: #d9a712;
+      box-shadow: 0 6px 0 0 var(--btn-shadow);
+    }
+    .btn-3d-white {
+      --btn-shadow: #e2e8f0;
+      box-shadow: 0 6px 0 0 var(--btn-shadow);
+    }
+
+    /* حركات سلسة ومبهجة */
+    @keyframes floatSlow {
+      0%, 100% { transform: translateY(0px) rotate(0deg); }
+      50% { transform: translateY(-10px) rotate(2deg); }
+    }
+    .animate-float {
+      animation: floatSlow 3.4s ease-in-out infinite;
+    }
+
+    @keyframes floatBlob {
+      0%, 100% { transform: translate(0, 0) scale(1); }
+      50% { transform: translate(12px, -16px) scale(1.05); }
+    }
+    .animate-blob {
+      animation: floatBlob 8s ease-in-out infinite;
+    }
+
+    @keyframes popIn {
+      0% { opacity: 0; transform: scale(0.85) translateY(14px); }
+      70% { opacity: 1; transform: scale(1.03) translateY(-2px); }
+      100% { opacity: 1; transform: scale(1) translateY(0); }
+    }
+    .animate-pop-in {
+      animation: popIn 0.42s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+    }
+
+    @keyframes gentleShake {
+      0%, 100% { transform: translateX(0); }
+      20% { transform: translateX(-8px) rotate(-1.5deg); }
+      40% { transform: translateX(8px) rotate(1.5deg); }
+      60% { transform: translateX(-6px) rotate(-1deg); }
+      80% { transform: translateX(6px) rotate(1deg); }
+    }
+    .animate-shake {
+      animation: gentleShake 0.42s ease-in-out;
+    }
+
+    @keyframes starPop {
+      0% { opacity: 0; transform: scale(0) rotate(-35deg); }
+      70% { opacity: 1; transform: scale(1.25) rotate(10deg); }
+      100% { opacity: 1; transform: scale(1) rotate(0deg); }
+    }
+    .animate-star-pop {
+      animation: starPop 0.55s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+    }
+
+    /* رسم خط التوصيل بشكل انسيابي */
+    @keyframes drawLine {
+      from { stroke-dashoffset: 600; }
+      to { stroke-dashoffset: 0; }
+    }
+    .svg-line-draw {
+      stroke-dasharray: 600;
+      animation: drawLine 0.45s ease-out forwards;
+    }
+
+    /* حلقة التوهج عند اختيار بطاقة في لعبة التوصيل */
+    .match-selected {
+      box-shadow: 0 0 0 4px #4D96FF, 0 8px 20px -4px rgba(77, 150, 255, 0.35) !important;
+      border-color: #4D96FF !important;
+      transform: scale(1.03);
+    }
+
+    .match-solved {
+      background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%) !important;
+      border-color: #2EC4B6 !important;
+      box-shadow: 0 5px 0 0 #1e968a !important;
+      cursor: default;
+    }
+  </style>
+</head>
+
+<body class="min-h-screen relative flex flex-col selection:bg-sunny/40">
+
+  <!-- خلفية أشكال باستيل هادئة وطفولية عصرية -->
+  <div class="fixed inset-0 pointer-events-none overflow-hidden -z-10" aria-hidden="true">
+    <div class="absolute -top-24 -right-24 w-80 h-80 rounded-full bg-sunny/20 blur-3xl animate-blob"></div>
+    <div class="absolute top-1/3 -left-24 w-96 h-96 rounded-full bg-skyplay/15 blur-3xl animate-blob" style="animation-delay: 2s;"></div>
+    <div class="absolute -bottom-24 right-1/4 w-96 h-96 rounded-full bg-coral/15 blur-3xl animate-blob" style="animation-delay: 4s;"></div>
+    <div class="absolute bottom-1/4 left-1/4 w-72 h-72 rounded-full bg-mint/15 blur-3xl animate-blob" style="animation-delay: 1s;"></div>
+  </div>
+
+  <!-- الشريط العلوي (Navbar) -->
+  <header class="sticky top-0 z-30 bg-white/80 backdrop-blur-md border-b-2 border-slate-100 shadow-sm">
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between gap-3">
+      <!-- شعار واسم الحضانة -->
+      <button onclick="navigateTo('home')" class="flex items-center gap-3 group focus:outline-none">
+        <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-sunny via-coral to-softpurple p-0.5 shadow-md group-hover:scale-105 transition-transform">
+          <div class="w-full h-full bg-white rounded-[14px] flex items-center justify-center">
+            <!-- أيقونة نجمة وقوس قزح لطيفة -->
+            <svg class="w-8 h-8" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M10 42C10 28.7452 20.7452 18 34 18C47.2548 18 58 28.7452 58 42" stroke="#FF6B6B" stroke-width="5" stroke-linecap="round"/>
+              <path d="M17 42C17 32.6112 24.6112 25 34 25C43.3888 25 51 32.6112 51 42" stroke="#FFD93D" stroke-width="5" stroke-linecap="round"/>
+              <path d="M24 42C24 36.4772 28.4772 32 34 32C39.5228 32 44 36.4772 44 42" stroke="#2EC4B6" stroke-width="5" stroke-linecap="round"/>
+              <path d="M32 6L35.1 12.6L42.3 13.6L37 18.7L38.3 25.8L32 22.4L25.7 25.8L27 18.7L21.7 13.6L28.9 12.6L32 6Z" fill="#FFD93D" stroke="#F59E0B" stroke-width="2" stroke-linejoin="round"/>
+            </svg>
+          </div>
+        </div>
+        <div class="text-right">
+          <h1 class="text-lg sm:text-xl font-black text-slate-800 leading-tight">حضانة النجوم الصغار</h1>
+          <p class="text-xs font-bold text-slate-400 hidden sm:block">تعلّم باللعب والمرح ✨</p>
+        </div>
+      </button>
+
+      <!-- أزرار التحكم العلوية -->
+      <div class="flex items-center gap-2 sm:gap-3">
+        <!-- عداد النجوم المصغر -->
+        <div class="flex items-center gap-1.5 bg-amber-50 border-2 border-amber-200 px-3 py-1.5 rounded-2xl shadow-sm" title="مجموع نجومك">
+          <span class="text-lg leading-none">⭐</span>
+          <span id="nav-stars-count" class="font-black text-amber-600 text-base sm:text-lg">0</span>
+        </div>
+
+        <!-- زر العودة للرئيسية (يظهر فقط داخل الاختبارات) -->
+        <button id="nav-home-btn" onclick="navigateTo('home')" class="hidden btn-3d btn-3d-white bg-white border-2 border-slate-200 text-slate-700 font-extrabold px-3.5 py-2 rounded-2xl text-sm sm:text-base flex items-center gap-1.5">
+          <span>🏠</span>
+          <span class="hidden sm:inline">الرئيسية</span>
+        </button>
+
+        <!-- زر كتم/تشغيل الصوت -->
+        <button id="sound-toggle-btn" onclick="toggleSound()" class="btn-3d btn-3d-white bg-white border-2 border-slate-200 text-slate-700 w-11 h-11 rounded-2xl flex items-center justify-center text-xl" aria-label="تبديل الصوت" title="تشغيل أو كتم الصوت">
+          🔊
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- المحتوى الرئيسي -->
+  <main class="flex-1 w-full max-w-5xl mx-auto px-4 sm:px-6 py-6 sm:py-10 flex flex-col justify-center">
+
+    <!-- ==================== الشاشة الرئيسية (Home Screen) ==================== -->
+    <section id="view-home" class="animate-pop-in space-y-8">
+      <!-- قسم الترحيب -->
+      <div class="bg-white/90 backdrop-blur-sm border-2 border-slate-100 rounded-3xl p-6 sm:p-10 shadow-xl shadow-slate-200/50 text-center relative overflow-hidden">
+        <!-- زخارف علوية -->
+        <div class="inline-flex items-center gap-2 bg-sky-50 border border-sky-200 text-sky-600 font-extrabold px-4 py-1.5 rounded-full text-sm mb-4">
+          <span>🎈</span>
+          <span>مغامرة تعليمية ممتعة</span>
+        </div>
+
+        <h2 class="text-3xl sm:text-5xl font-black text-slate-800 mb-3 leading-snug">
+          أهلاً يا بطل! هيا نلعب ونتعلم <span class="inline-block animate-bounce">🌟</span>
+        </h2>
+        <p class="text-slate-500 font-bold text-base sm:text-lg max-w-xl mx-auto mb-6">
+          اختر اللعبة التي تحبها واجمع الكثير من النجوم الذهبية واحتفل بالمفرقعات الملونة!
+        </p>
+
+        <!-- شارة مجموع النجوم في الجلسة -->
+        <div class="inline-flex items-center gap-3 bg-gradient-to-l from-amber-50 to-yellow-50 border-2 border-amber-200 rounded-2xl px-5 py-2.5 shadow-sm">
+          <span class="text-2xl">🏆</span>
+          <span class="font-extrabold text-slate-700 text-sm sm:text-base">نجومك اليوم:</span>
+          <span id="home-stars-count" class="text-2xl font-black text-amber-500">0</span>
+          <span class="text-xl">⭐</span>
+        </div>
+      </div>
+
+      <!-- بطاقات الاختبارات (بطاقتان متجاورتان) -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8">
+
+        <!-- البطاقة 1: اختبار عالم الحيوانات -->
+        <button onclick="startAnimalQuiz()" class="btn-3d btn-3d-mint group text-right bg-gradient-to-br from-emerald-50 via-white to-teal-50 border-2 border-mint/40 rounded-3xl p-6 sm:p-8 flex flex-col justify-between gap-6 relative overflow-hidden focus:outline-none">
+          <div class="flex items-start justify-between gap-4 w-full">
+            <span class="inline-flex items-center gap-1.5 bg-mint text-white font-extrabold text-xs sm:text-sm px-3.5 py-1.5 rounded-full shadow-sm">
+              <span>🐾</span>
+              <span>10 أسئلة ممتعة</span>
+            </span>
+            <div class="w-20 h-20 sm:w-24 sm:h-24 rounded-3xl bg-gradient-to-br from-amber-100 to-orange-100 border-2 border-amber-200 flex items-center justify-center text-5xl sm:text-6xl shadow-inner group-hover:scale-110 group-hover:rotate-3 transition-transform">
+              🦁
+            </div>
+          </div>
+
+          <div class="space-y-2">
+            <h3 class="text-2xl sm:text-3xl font-black text-slate-800 group-hover:text-teal-700 transition-colors">
+              اختبار عالم الحيوانات
+            </h3>
+            <p class="text-slate-500 font-bold text-sm sm:text-base leading-relaxed">
+              شاهد صورة الحيوان الجميل واختر اسمه الصحيح من بين الاختيارات!
+            </p>
+          </div>
+
+          <div class="w-full pt-2 flex items-center justify-between">
+            <div class="flex -space-x-2 space-x-reverse text-2xl">
+              <span class="bg-white rounded-full w-9 h-9 flex items-center justify-center shadow border border-slate-100">🐘</span>
+              <span class="bg-white rounded-full w-9 h-9 flex items-center justify-center shadow border border-slate-100">🦒</span>
+              <span class="bg-white rounded-full w-9 h-9 flex items-center justify-center shadow border border-slate-100">🐼</span>
+            </div>
+            <span class="bg-mint text-white font-black px-5 py-2.5 rounded-2xl text-base shadow-md group-hover:bg-teal-500 transition-colors">
+              ابدأ اللعب ←
+            </span>
+          </div>
+        </button>
+
+        <!-- البطاقة 2: لعبة التوصيل الذكية -->
+        <button onclick="startMatchingGame()" class="btn-3d btn-3d-purple group text-right bg-gradient-to-br from-purple-50 via-white to-indigo-50 border-2 border-softpurple/40 rounded-3xl p-6 sm:p-8 flex flex-col justify-between gap-6 relative overflow-hidden focus:outline-none">
+          <div class="flex items-start justify-between gap-4 w-full">
+            <span class="inline-flex items-center gap-1.5 bg-softpurple text-white font-extrabold text-xs sm:text-sm px-3.5 py-1.5 rounded-full shadow-sm">
+              <span>🧩</span>
+              <span>جولتان ذكيتان</span>
+            </span>
+            <div class="w-20 h-20 sm:w-24 sm:h-24 rounded-3xl bg-gradient-to-br from-rose-100 to-sky-100 border-2 border-purple-200 flex items-center justify-center text-4xl sm:text-5xl shadow-inner group-hover:scale-110 group-hover:-rotate-3 transition-transform gap-1">
+              <span>🍎</span><span class="text-3xl sm:text-4xl">👮‍♂️</span>
+            </div>
+          </div>
+
+          <div class="space-y-2">
+            <h3 class="text-2xl sm:text-3xl font-black text-slate-800 group-hover:text-purple-700 transition-colors">
+              لعبة التوصيل الذكية
+            </h3>
+            <p class="text-slate-500 font-bold text-sm sm:text-base leading-relaxed">
+              وصّل الكلمة بالشكل المناسب لها بخطوط ملونة سحرية!
+            </p>
+          </div>
+
+          <div class="w-full pt-2 flex items-center justify-between">
+            <div class="flex -space-x-2 space-x-reverse text-2xl">
+              <span class="bg-white rounded-full w-9 h-9 flex items-center justify-center shadow border border-slate-100">☀️</span>
+              <span class="bg-white rounded-full w-9 h-9 flex items-center justify-center shadow border border-slate-100">🚗</span>
+              <span class="bg-white rounded-full w-9 h-9 flex items-center justify-center shadow border border-slate-100">✈️</span>
+            </div>
+            <span class="bg-softpurple text-white font-black px-5 py-2.5 rounded-2xl text-base shadow-md group-hover:bg-purple-600 transition-colors">
+              ابدأ التوصيل ←
+            </span>
+          </div>
+        </button>
+
+      </div>
+    </section>
+
+    <!-- ==================== الاختبار الأول: عالم الحيوانات ==================== -->
+    <section id="view-animals" class="hidden animate-pop-in max-w-3xl mx-auto w-full space-y-6">
+      <!-- شريط التقدم والنتيجة -->
+      <div class="bg-white rounded-3xl p-4 sm:p-5 border-2 border-slate-100 shadow-md space-y-3">
+        <div class="flex items-center justify-between text-sm sm:text-base font-extrabold">
+          <span id="animal-counter" class="text-slate-700 bg-slate-100 px-3.5 py-1 rounded-full">السؤال 1 من 10</span>
+          <span class="text-teal-600 flex items-center gap-1.5 bg-teal-50 px-3.5 py-1 rounded-full">
+            <span>⭐</span>
+            <span>النقاط: <span id="animal-score">0</span></span>
+          </span>
+        </div>
+        <div class="w-full h-4 bg-slate-100 rounded-full overflow-hidden p-0.5">
+          <div id="animal-progress-bar" class="h-full bg-gradient-to-l from-mint to-skyplay rounded-full transition-all duration-500 ease-out" style="width: 10%;"></div>
+        </div>
+      </div>
+
+      <!-- بطاقة عرض الحيوان -->
+      <div class="bg-white rounded-3xl p-6 sm:p-8 border-2 border-slate-100 shadow-xl shadow-slate-200/50 text-center relative">
+        <h3 class="text-xl sm:text-2xl font-black text-slate-700 mb-5">ما اسم هذا الحيوان الجميل؟ 🤔</h3>
+
+        <!-- منصة الحيوان -->
+        <div id="animal-stage" class="w-full max-w-md mx-auto h-48 sm:h-56 rounded-3xl bg-gradient-to-br from-amber-100 to-orange-100 border-4 border-white shadow-inner flex items-center justify-center relative overflow-hidden mb-6">
+          <span class="absolute top-3 right-5 text-2xl opacity-50">✨</span>
+          <span class="absolute bottom-3 left-5 text-2xl opacity-50">🌟</span>
+          <div id="animal-emoji" class="text-8xl sm:text-9xl animate-float select-none drop-shadow-md">🦁</div>
+        </div>
+
+        <!-- رسالة التشجيع التفاعلية -->
+        <div id="animal-feedback" class="h-9 mb-4 flex items-center justify-center">
+          <span class="text-slate-400 font-bold text-sm sm:text-base">اضغط على الإجابة الصحيحة بالأسفل 👇</span>
+        </div>
+
+        <!-- شبكة الاختيارات (2x2) -->
+        <div id="animal-options" class="grid grid-cols-2 gap-4 sm:gap-5">
+          <!-- يتم توليد الأزرار عبر JavaScript -->
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== الاختبار الثاني: لعبة التوصيل الذكية ==================== -->
+    <section id="view-matching" class="hidden animate-pop-in max-w-4xl mx-auto w-full space-y-6">
+      <!-- شريط التقدم للجولات -->
+      <div class="bg-white rounded-3xl p-4 sm:p-5 border-2 border-slate-100 shadow-md space-y-3">
+        <div class="flex flex-wrap items-center justify-between gap-2 text-sm sm:text-base font-extrabold">
+          <span id="match-round-badge" class="text-purple-700 bg-purple-100 px-4 py-1 rounded-full">الجولة 1 من 2</span>
+          <span id="match-instruction" class="text-slate-600 text-xs sm:text-base">اضغط على الكلمة ثم اضغط على صورتها المناسبة ✨</span>
+          <span class="text-teal-600 bg-teal-50 px-3.5 py-1 rounded-full">
+            تم التوصيل: <span id="match-solved-count">0</span> / 4
+          </span>
+        </div>
+        <div class="w-full h-4 bg-slate-100 rounded-full overflow-hidden p-0.5">
+          <div id="match-progress-bar" class="h-full bg-gradient-to-l from-softpurple to-coral rounded-full transition-all duration-500 ease-out" style="width: 0%;"></div>
+        </div>
+      </div>
+
+      <!-- ساحة التوصيل مع طبقة SVG للخطوط -->
+      <div class="bg-white rounded-3xl p-4 sm:p-8 border-2 border-slate-100 shadow-xl shadow-slate-200/50 relative">
+        <!-- رسالة التشجيع العلوية -->
+        <div id="match-feedback" class="text-center mb-5 h-8 flex items-center justify-center">
+          <span class="text-slate-500 font-bold text-sm sm:text-base">اختر بطاقة من اليمين وبطاقة من اليسار لتوصيلهما! 🔗</span>
+        </div>
+
+        <!-- حاوية الأعمدة وخطوط SVG -->
+        <div id="matching-stage" class="relative grid grid-cols-2 gap-10 sm:gap-20 md:gap-28 items-center py-2">
+          <!-- طبقة خطوط التوصيل SVG -->
+          <svg id="matching-svg" class="absolute inset-0 w-full h-full pointer-events-none z-10 overflow-visible"></svg>
+
+          <!-- العمود الأيمن: الكلمات -->
+          <div id="matching-words-col" class="flex flex-col gap-4 sm:gap-5 relative z-20">
+            <!-- يتم التوليد عبر JavaScript -->
+          </div>
+
+          <!-- العمود الأيسر: الصور والأشكال -->
+          <div id="matching-icons-col" class="flex flex-col gap-4 sm:gap-5 relative z-20">
+            <!-- يتم التوليد عبر JavaScript -->
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== شاشة الاحتفال والنتائج (Completion Screen) ==================== -->
+    <section id="view-complete" class="hidden animate-pop-in max-w-2xl mx-auto w-full">
+      <div class="bg-white rounded-3xl p-7 sm:p-10 border-4 border-sunny/60 shadow-2xl shadow-amber-200/40 text-center space-y-6 relative overflow-hidden">
+        <!-- شريط علوي ملون -->
+        <div class="absolute top-0 inset-x-0 h-3 bg-gradient-to-r from-coral via-sunny via-mint to-softpurple"></div>
+
+        <!-- النجوم المتحركة -->
+        <div id="result-stars" class="flex items-center justify-center gap-3 sm:gap-5 pt-2">
+          <!-- يتم التوليد عبر JavaScript -->
+        </div>
+
+        <!-- عنوان التشجيع -->
+        <div class="space-y-2">
+          <h2 class="text-3xl sm:text-4xl font-black text-slate-800 leading-snug">
+            أحسنت يا بطل! أنت عبقري صغير 🏆
+          </h2>
+          <p id="result-subtitle" class="text-slate-500 font-bold text-base sm:text-lg">
+            لقد أتممت الاختبار بنجاح باهر!
+          </p>
+        </div>
+
+        <!-- بطاقة النتيجة النهائية -->
+        <div class="inline-flex flex-col sm:flex-row items-center gap-3 sm:gap-6 bg-gradient-to-br from-amber-50 to-orange-50 border-2 border-amber-200 rounded-3xl px-8 py-4 shadow-inner">
+          <div class="text-center">
+            <div class="text-xs font-extrabold text-amber-700 mb-0.5">نتيجتك الرائعة</div>
+            <div id="result-score-text" class="text-3xl sm:text-4xl font-black text-amber-500">10 / 10</div>
+          </div>
+          <div class="hidden sm:block w-0.5 h-10 bg-amber-200"></div>
+          <div class="text-center">
+            <div class="text-xs font-extrabold text-teal-700 mb-0.5">النجوم المكتسبة</div>
+            <div id="result-earned-stars" class="text-3xl sm:text-4xl font-black text-teal-500">+3 ⭐</div>
+          </div>
+        </div>
+
+        <!-- أزرار التحكم والاحتفال -->
+        <div class="flex flex-col gap-3.5 pt-2 max-w-md mx-auto">
+          <button onclick="launchCelebrationConfetti()" class="btn-3d btn-3d-sunny w-full bg-sunny text-slate-900 font-black text-lg py-3.5 px-6 rounded-2xl flex items-center justify-center gap-2">
+            <span>أطلق المفرقعات مرة أخرى!</span>
+            <span class="text-2xl">🎊</span>
+          </button>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+            <button onclick="replayCurrentExam()" class="btn-3d btn-3d-sky bg-skyplay text-white font-black text-base py-3.5 px-5 rounded-2xl flex items-center justify-center gap-2">
+              <span>🔄</span>
+              <span>إعادة الاختبار</span>
+            </button>
+            <button onclick="navigateTo('home')" class="btn-3d btn-3d-white bg-white border-2 border-slate-200 text-slate-700 font-black text-base py-3.5 px-5 rounded-2xl flex items-center justify-center gap-2">
+              <span>🏠</span>
+              <span>العودة للرئيسية</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- تذييل بسيط ومبهج -->
+  <footer class="py-4 text-center text-xs sm:text-sm font-bold text-slate-400">
+    صُمم بحب لأطفال <span class="text-coral">حضانة النجوم الصغار</span> 🌈✨
+  </footer>
+
+  <!-- ==================== المنطق البرمجي للتطبيق ==================== -->
+  <script>
+    // =========================================================================
+    // 1. إدارة الصوت باستخدام Web Audio API (بدون ملفات صوتية خارجية)
+    // =========================================================================
+    const SoundFX = {
+      enabled: true,
+      ctx: null,
+
+      /** تهيئة AudioContext عند أول تفاعل للمستخدم */
+      init() {
+        try {
+          if (!this.ctx) {
+            const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+            if (AudioContextClass) {
+              this.ctx = new AudioContextClass();
+            }
+          }
+          if (this.ctx && this.ctx.state === 'suspended') {
+            this.ctx.resume();
+          }
+        } catch (err) {
+          console.warn('Web Audio API غير مدعوم:', err);
+        }
+      },
+
+      /** تشغيل نغمة مفردة ناعمة */
+      playTone(freq, duration, type = 'sine', startTimeOffset = 0, volume = 0.16) {
+        if (!this.enabled) return;
+        this.init();
+        if (!this.ctx) return;
+
+        try {
+          const now = this.ctx.currentTime + startTimeOffset;
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+
+          osc.type = type;
+          osc.frequency.setValueAtTime(freq, now);
+
+          gain.gain.setValueAtTime(0.001, now);
+          gain.gain.exponentialRampToValueAtTime(volume, now + 0.02);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + duration);
+
+          osc.connect(gain);
+          gain.connect(this.ctx.destination);
+
+          osc.start(now);
+          osc.stop(now + duration + 0.02);
+        } catch (err) {
+          console.warn('تعذر تشغيل النغمة:', err);
+        }
+      },
+
+      /** صوت نقرة لطيفة عند الاختيار */
+      playSelect() {
+        this.playTone(520, 0.09, 'sine', 0, 0.12);
+      },
+
+      /** نغمة مبهجة للإجابة الصحيحة */
+      playCorrect() {
+        this.playTone(523.25, 0.14, 'triangle', 0, 0.18);     // C5
+        this.playTone(659.25, 0.16, 'triangle', 0.1, 0.18);   // E5
+        this.playTone(783.99, 0.28, 'triangle', 0.2, 0.2);    // G5
+      },
+
+      /** نغمة لطيفة غير مزعجة للمحاولة الخاطئة */
+      playWrong() {
+        this.playTone(280, 0.15, 'sine', 0, 0.15);
+        this.playTone(220, 0.22, 'sine', 0.12, 0.14);
+      },
+
+      /** معزوفة احتفالية عند إتمام الاختبار */
+      playFanfare() {
+        const notes = [
+          { f: 523.25, t: 0.00, d: 0.14 }, // C5
+          { f: 659.25, t: 0.13, d: 0.14 }, // E5
+          { f: 783.99, t: 0.26, d: 0.14 }, // G5
+          { f: 1046.5, t: 0.40, d: 0.45 }, // C6
+          { f: 783.99, t: 0.56, d: 0.16 }, // G5
+          { f: 1046.5, t: 0.72, d: 0.55 }, // C6
+        ];
+        notes.forEach(n => this.playTone(n.f, n.d, 'triangle', n.t, 0.2));
+      }
+    };
+
+    /** تبديل حالة الصوت */
+    function toggleSound() {
+      SoundFX.enabled = !SoundFX.enabled;
+      const btn = document.getElementById('sound-toggle-btn');
+      btn.textContent = SoundFX.enabled ? '🔊' : '🔇';
+      if (SoundFX.enabled) {
+        SoundFX.playSelect();
+      }
+    }
+
+    // =========================================================================
+    // 2. البيانات التعليمية وحالة التطبيق العامة
+    // =========================================================================
+    const ANIMALS_DATA = [
+      { name: 'أسد', emoji: '🦁', bg: 'from-amber-100 to-orange-100' },
+      { name: 'فيل', emoji: '🐘', bg: 'from-sky-100 to-blue-100' },
+      { name: 'زرافة', emoji: '🦒', bg: 'from-yellow-100 to-amber-100' },
+      { name: 'قرد', emoji: '🐵', bg: 'from-orange-100 to-rose-100' },
+      { name: 'أرنب', emoji: '🐰', bg: 'from-pink-100 to-purple-100' },
+      { name: 'قطة', emoji: '🐱', bg: 'from-rose-100 to-amber-100' },
+      { name: 'بطريق', emoji: '🐧', bg: 'from-cyan-100 to-sky-100' },
+      { name: 'دولفين', emoji: '🐬', bg: 'from-blue-100 to-teal-100' },
+      { name: 'باندا', emoji: '🐼', bg: 'from-emerald-100 to-lime-100' },
+      { name: 'سلحفاة', emoji: '🐢', bg: 'from-green-100 to-emerald-100' }
+    ];
+
+    const MATCHING_ROUNDS = [
+      [
+        { id: 'apple', word: 'تفاحة', emoji: '🍎', color: '#FF6B6B' },
+        { id: 'officer', word: 'ضابط', emoji: '👮‍♂️', color: '#4D96FF' },
+        { id: 'sun', word: 'شمس', emoji: '☀️', color: '#F59E0B' },
+        { id: 'car', word: 'سيارة', emoji: '🚗', color: '#2EC4B6' }
+      ],
+      [
+        { id: 'doctor', word: 'طبيب', emoji: '👨‍⚕️', color: '#2EC4B6' },
+        { id: 'plane', word: 'طائرة', emoji: '✈️', color: '#4D96FF' },
+        { id: 'banana', word: 'موز', emoji: '🍌', color: '#EAB308' },
+        { id: 'house', word: 'منزل', emoji: '🏠', color: '#845EC2' }
+      ]
+    ];
+
+    const PRAISE_MESSAGES = [
+      'ممتاز يا بطل! 🌟',
+      'شاطر جداً! 👏',
+      'إجابة رائعة! 🎉',
+      'أنت ذكي جداً! 💡',
+      'برافو عليك! 🥳'
+    ];
+
+    // الحالة العامة
+    const appState = {
+      currentView: 'home',
+      lastExam: null, // 'animals' أو 'matching'
+      totalStars: 0
+    };
+
+    // دالة خلط المصفوفة (Fisher-Yates Shuffle)
+    function shuffleArray(arr) {
+      const copy = [...arr];
+      for (let i = copy.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [copy[i], copy[j]] = [copy[j], copy[i]];
+      }
+      return copy;
+    }
+
+    /** تحديث عدادات النجوم في الواجهة */
+    function updateStarsUI() {
+      document.getElementById('nav-stars-count').textContent = appState.totalStars;
+      document.getElementById('home-stars-count').textContent = appState.totalStars;
+    }
+
+    /** التنقل بين الشاشات بسلاسة */
+    function navigateTo(viewName) {
+      SoundFX.playSelect();
+      appState.currentView = viewName;
+
+      const views = ['home', 'animals', 'matching', 'complete'];
+      views.forEach(v => {
+        const el = document.getElementById(`view-${v}`);
+        if (v === viewName) {
+          el.classList.remove('hidden');
+          // إعادة تشغيل حركة الظهور
+          el.classList.remove('animate-pop-in');
+          void el.offsetWidth;
+          el.classList.add('animate-pop-in');
+        } else {
+          el.classList.add('hidden');
+        }
+      });
+
+      // إظهار أو إخفاء زر الرئيسية في الشريط العلوي
+      const homeBtn = document.getElementById('nav-home-btn');
+      if (viewName === 'home') {
+        homeBtn.classList.add('hidden');
+      } else {
+        homeBtn.classList.remove('hidden');
+      }
+
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // =========================================================================
+    // 3. منطق الاختبار الأول: اختبار عالم الحيوانات (10 أسئلة)
+    // =========================================================================
+    const animalQuiz = {
+      questions: [],
+      currentIndex: 0,
+      score: 0,
+      locked: false,
+      timeoutId: null
+    };
+
+    function startAnimalQuiz() {
+      clearTimeout(animalQuiz.timeoutId);
+      appState.lastExam = 'animals';
+      animalQuiz.questions = shuffleArray(ANIMALS_DATA);
+      animalQuiz.currentIndex = 0;
+      animalQuiz.score = 0;
+      animalQuiz.locked = false;
+
+      navigateTo('animals');
+      renderAnimalQuestion();
+    }
+
+    function renderAnimalQuestion() {
+      const total = animalQuiz.questions.length;
+      const current = animalQuiz.questions[animalQuiz.currentIndex];
+      animalQuiz.locked = false;
+
+      // تحديث العداد وشريط التقدم
+      document.getElementById('animal-counter').textContent = `السؤال ${animalQuiz.currentIndex + 1} من ${total}`;
+      document.getElementById('animal-score').textContent = animalQuiz.score;
+      document.getElementById('animal-progress-bar').style.width = `${((animalQuiz.currentIndex + 1) / total) * 100}%`;
+
+      // تحديث منصة الحيوان
+      const stage = document.getElementById('animal-stage');
+      stage.className = `w-full max-w-md mx-auto h-48 sm:h-56 rounded-3xl bg-gradient-to-br ${current.bg} border-4 border-white shadow-inner flex items-center justify-center relative overflow-hidden mb-6`;
+
+      const emojiEl = document.getElementById('animal-emoji');
+      emojiEl.textContent = current.emoji;
+      emojiEl.classList.remove('animate-pop-in');
+      void emojiEl.offsetWidth;
+      emojiEl.classList.add('animate-pop-in');
+
+      // إعادة تعيين رسالة التشجيع
+      document.getElementById('animal-feedback').innerHTML =
+        `<span class="text-slate-400 font-bold text-sm sm:text-base">اضغط على الإجابة الصحيحة بالأسفل 👇</span>`;
+
+      // تجهيز 4 اختيارات (الإجابة الصحيحة + 3 اختيارات عشوائية)
+      const distractors = shuffleArray(ANIMALS_DATA.filter(a => a.name !== current.name)).slice(0, 3);
+      const options = shuffleArray([current, ...distractors]);
+
+      const optionsContainer = document.getElementById('animal-options');
+      optionsContainer.innerHTML = '';
+
+      options.forEach(opt => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.dataset.name = opt.name;
+        btn.className = 'btn-3d btn-3d-white bg-white hover:bg-sky-50 border-2 border-slate-200 hover:border-skyplay rounded-2xl py-4 sm:py-5 px-4 text-xl sm:text-2xl font-black text-slate-700 flex items-center justify-center gap-2 focus:outline-none';
+        btn.innerHTML = `<span>${opt.name}</span>`;
+        btn.onclick = () => handleAnimalAnswer(btn, opt.name, current.name);
+        optionsContainer.appendChild(btn);
+      });
+    }
+
+    function handleAnimalAnswer(selectedBtn, chosenName, correctName) {
+      if (animalQuiz.locked) return;
+      animalQuiz.locked = true;
+
+      const allButtons = Array.from(document.querySelectorAll('#animal-options button'));
+      const feedbackEl = document.getElementById('animal-feedback');
+
+      if (chosenName === correctName) {
+        // إجابة صحيحة
+        animalQuiz.score += 1;
+        document.getElementById('animal-score').textContent = animalQuiz.score;
+
+        selectedBtn.className = 'btn-3d btn-3d-mint bg-mint border-2 border-teal-500 text-white rounded-2xl py-4 sm:py-5 px-4 text-xl sm:text-2xl font-black flex items-center justify-center gap-2 scale-[1.03]';
+        selectedBtn.innerHTML = `<span>✅</span><span>${chosenName}</span>`;
+
+        const praise = PRAISE_MESSAGES[Math.floor(Math.random() * PRAISE_MESSAGES.length)];
+        feedbackEl.innerHTML = `<span class="text-teal-600 font-black text-lg sm:text-xl animate-pop-in">${praise}</span>`;
+
+        SoundFX.playCorrect();
+        triggerMiniConfetti();
+      } else {
+        // إجابة خاطئة - اهتزاز لطيف وتوضيح الإجابة الصحيحة ليتعلم الطفل
+        selectedBtn.className = 'btn-3d btn-3d-coral bg-coral/90 border-2 border-rose-500 text-white rounded-2xl py-4 sm:py-5 px-4 text-xl sm:text-2xl font-black flex items-center justify-center gap-2 animate-shake';
+        selectedBtn.innerHTML = `<span>❌</span><span>${chosenName}</span>`;
+
+        // تمييز الإجابة الصحيحة
+        const correctBtn = allButtons.find(b => b.dataset.name === correctName);
+        if (correctBtn) {
+          correctBtn.className = 'btn-3d btn-3d-mint bg-emerald-100 border-2 border-mint text-teal-800 rounded-2xl py-4 sm:py-5 px-4 text-xl sm:text-2xl font-black flex items-center justify-center gap-2';
+          correctBtn.innerHTML = `<span>✨</span><span>${correctName}</span>`;
+        }
+
+        feedbackEl.innerHTML = `<span class="text-coral font-black text-base sm:text-lg animate-pop-in">قريب جداً! الإجابة الصحيحة هي: ${correctName} 💡</span>`;
+        SoundFX.playWrong();
+      }
+
+      // الانتقال للسؤال التالي أو شاشة الاحتفال
+      animalQuiz.timeoutId = setTimeout(() => {
+        animalQuiz.currentIndex += 1;
+        if (animalQuiz.currentIndex < animalQuiz.questions.length) {
+          renderAnimalQuestion();
+        } else {
+          showCompletionScreen({
+            score: animalQuiz.score,
+            total: animalQuiz.questions.length,
+            subtitle: 'لقد تعرفت على أصدقائك الحيوانات بكل ذكاء ومرح! 🐾'
+          });
+        }
+      }, 1350);
+    }
+
+    // =========================================================================
+    // 4. منطق الاختبار الثاني: لعبة التوصيل الذكية (جولتان مع خطوط SVG)
+    // =========================================================================
+    const matchGame = {
+      roundIndex: 0,
+      selectedWordId: null,
+      selectedIconId: null,
+      matchedIds: [], // قائمة المعرفات التي تم توصيلها في الجولة الحالية
+      totalMistakes: 0,
+      locked: false,
+      timeoutId: null
+    };
+
+    function startMatchingGame() {
+      clearTimeout(matchGame.timeoutId);
+      appState.lastExam = 'matching';
+      matchGame.roundIndex = 0;
+      matchGame.totalMistakes = 0;
+
+      navigateTo('matching');
+      renderMatchingRound();
+    }
+
+    function renderMatchingRound() {
+      const roundItems = MATCHING_ROUNDS[matchGame.roundIndex];
+      matchGame.selectedWordId = null;
+      matchGame.selectedIconId = null;
+      matchGame.matchedIds = [];
+      matchGame.locked = false;
+
+      // تحديث الشريط العلوي
+      document.getElementById('match-round-badge').textContent = `الجولة ${matchGame.roundIndex + 1} من ${MATCHING_ROUNDS.length}`;
+      document.getElementById('match-solved-count').textContent = '0';
+      updateMatchProgressBar();
+
+      document.getElementById('match-feedback').innerHTML =
+        `<span class="text-slate-500 font-bold text-sm sm:text-base">اختر بطاقة من اليمين وبطاقة من اليسار لتوصيلهما! 🔗</span>`;
+
+      // تفريغ الخطوط السابقة
+      document.getElementById('matching-svg').innerHTML = '';
+
+      // خلط الكلمات والصور بشكل مستقل
+      const wordsOrder = shuffleArray(roundItems);
+      let iconsOrder = shuffleArray(roundItems);
+      // ضمان عدم تطابق كل الترتيب تماماً بالصدفة لزيادة المتعة
+      if (iconsOrder.every((item, idx) => item.id === wordsOrder[idx].id)) {
+        iconsOrder.reverse();
+      }
+
+      const wordsCol = document.getElementById('matching-words-col');
+      const iconsCol = document.getElementById('matching-icons-col');
+      wordsCol.innerHTML = '';
+      iconsCol.innerHTML = '';
+
+      // إنشاء بطاقات الكلمات (العمود الأيمن في RTL)
+      wordsOrder.forEach(item => {
+        const card = document.createElement('button');
+        card.type = 'button';
+        card.id = `word-card-${item.id}`;
+        card.dataset.id = item.id;
+        card.className = 'btn-3d btn-3d-white relative w-full min-h-[76px] sm:min-h-[90px] bg-white border-2 border-slate-200 rounded-2xl px-4 py-3 flex items-center justify-center text-xl sm:text-2xl font-black text-slate-800 focus:outline-none transition-all';
+        card.innerHTML = `
+          <span>${item.word}</span>
+          <span class="star-badge hidden absolute -top-2.5 -right-2.5 w-7 h-7 rounded-full bg-sunny text-sm flex items-center justify-center shadow">⭐</span>
+          <!-- نقطة التوصيل على الحافة اليسرى باتجاه المنتصف -->
+          <span id="dot-word-${item.id}" class="absolute -left-2.5 top-1/2 -translate-y-1/2 w-5 h-5 rounded-full bg-white border-4 border-skyplay shadow-sm transition-colors"></span>
+        `;
+        card.onclick = () => handleMatchSelection('word', item.id);
+        wordsCol.appendChild(card);
+      });
+
+      // إنشاء بطاقات الصور (العمود الأيسر في RTL)
+      iconsOrder.forEach(item => {
+        const card = document.createElement('button');
+        card.type = 'button';
+        card.id = `icon-card-${item.id}`;
+        card.dataset.id = item.id;
+        card.className = 'btn-3d btn-3d-white relative w-full min-h-[76px] sm:min-h-[90px] bg-gradient-to-br from-slate-50 to-white border-2 border-slate-200 rounded-2xl px-4 py-3 flex items-center justify-center text-4xl sm:text-5xl focus:outline-none transition-all';
+        card.innerHTML = `
+          <span class="drop-shadow-sm">${item.emoji}</span>
+          <span class="star-badge hidden absolute -top-2.5 -left-2.5 w-7 h-7 rounded-full bg-sunny text-sm flex items-center justify-center shadow">⭐</span>
+          <!-- نقطة التوصيل على الحافة اليمنى باتجاه المنتصف -->
+          <span id="dot-icon-${item.id}" class="absolute -right-2.5 top-1/2 -translate-y-1/2 w-5 h-5 rounded-full bg-white border-4 border-softpurple shadow-sm transition-colors"></span>
+        `;
+        card.onclick = () => handleMatchSelection('icon', item.id);
+        iconsCol.appendChild(card);
+      });
+    }
+
+    function handleMatchSelection(side, id) {
+      if (matchGame.locked || matchGame.matchedIds.includes(id)) return;
+
+      SoundFX.playSelect();
+
+      if (side === 'word') {
+        // إزالة التحديد السابق من عمود الكلمات
+        if (matchGame.selectedWordId) {
+          const prev = document.getElementById(`word-card-${matchGame.selectedWordId}`);
+          if (prev) prev.classList.remove('match-selected');
+        }
+        matchGame.selectedWordId = id;
+        document.getElementById(`word-card-${id}`).classList.add('match-selected');
+      } else {
+        // إزالة التحديد السابق من عمود الصور
+        if (matchGame.selectedIconId) {
+          const prev = document.getElementById(`icon-card-${matchGame.selectedIconId}`);
+          if (prev) prev.classList.remove('match-selected');
+        }
+        matchGame.selectedIconId = id;
+        document.getElementById(`icon-card-${id}`).classList.add('match-selected');
+      }
+
+      // إذا تم اختيار بطاقة من كل عمود، نتحقق من التطابق
+      if (matchGame.selectedWordId && matchGame.selectedIconId) {
+        checkMatchPair();
+      }
+    }
+
+    function checkMatchPair() {
+      const wordId = matchGame.selectedWordId;
+      const iconId = matchGame.selectedIconId;
+      const wordCard = document.getElementById(`word-card-${wordId}`);
+      const iconCard = document.getElementById(`icon-card-${iconId}`);
+      const feedbackEl = document.getElementById('match-feedback');
+
+      if (wordId === iconId) {
+        // تطابق صحيح!
+        matchGame.matchedIds.push(wordId);
+        matchGame.selectedWordId = null;
+        matchGame.selectedIconId = null;
+
+        // تحديث مظهر البطاقتين
+        [wordCard, iconCard].forEach(card => {
+          card.classList.remove('match-selected');
+          card.classList.add('match-solved');
+          const badge = card.querySelector('.star-badge');
+          if (badge) badge.classList.remove('hidden');
+        });
+
+        // تلوين نقطتي التوصيل بالأخضر
+        const dotW = document.getElementById(`dot-word-${wordId}`);
+        const dotI = document.getElementById(`dot-icon-${iconId}`);
+        if (dotW) dotW.style.borderColor = '#2EC4B6';
+        if (dotI) dotI.style.borderColor = '#2EC4B6';
+
+        // رسم الخط المنحني الملون
+        drawAllMatchLines(true, wordId);
+
+        SoundFX.playCorrect();
+        triggerMiniConfetti();
+
+        const praise = PRAISE_MESSAGES[Math.floor(Math.random() * PRAISE_MESSAGES.length)];
+        feedbackEl.innerHTML = `<span class="text-teal-600 font-black text-base sm:text-lg animate-pop-in">${praise}</span>`;
+
+        document.getElementById('match-solved-count').textContent = matchGame.matchedIds.length;
+        updateMatchProgressBar();
+
+        // التحقق من انتهاء الجولة الحالية
+        const roundTotal = MATCHING_ROUNDS[matchGame.roundIndex].length;
+        if (matchGame.matchedIds.length === roundTotal) {
+          matchGame.locked = true;
+          matchGame.timeoutId = setTimeout(() => {
+            if (matchGame.roundIndex + 1 < MATCHING_ROUNDS.length) {
+              matchGame.roundIndex += 1;
+              renderMatchingRound();
+            } else {
+              const totalPairs = MATCHING_ROUNDS.reduce((sum, r) => sum + r.length, 0);
+              showCompletionScreen({
+                score: totalPairs,
+                total: totalPairs,
+                subtitle: 'توصيل مثالي ورائع في جميع الجولات! 🧩✨'
+              });
+            }
+          }, 1150);
+        }
+      } else {
+        // تطابق خاطئ - اهتزاز لطيف والسماح بالمحاولة فوراً
+        matchGame.locked = true;
+        matchGame.totalMistakes += 1;
+        SoundFX.playWrong();
+
+        [wordCard, iconCard].forEach(card => {
+          card.classList.remove('match-selected');
+          card.classList.add('animate-shake', 'border-coral', 'bg-rose-50');
+        });
+
+        feedbackEl.innerHTML = `<span class="text-coral font-black text-base sm:text-lg">حاول مرة أخرى يا بطل! 💪</span>`;
+
+        setTimeout(() => {
+          [wordCard, iconCard].forEach(card => {
+            card.classList.remove('animate-shake', 'border-coral', 'bg-rose-50');
+          });
+          matchGame.selectedWordId = null;
+          matchGame.selectedIconId = null;
+          matchGame.locked = false;
+        }, 480);
+      }
+    }
+
+    /** تحديث شريط التقدم للعبة التوصيل */
+    function updateMatchProgressBar() {
+      const totalPairsAllRounds = MATCHING_ROUNDS.reduce((sum, r) => sum + r.length, 0);
+      const completedPreviousRounds = matchGame.roundIndex * 4;
+      const currentSolved = matchGame.matchedIds.length;
+      const pct = ((completedPreviousRounds + currentSolved) / totalPairsAllRounds) * 100;
+      document.getElementById('match-progress-bar').style.width = `${pct}%`;
+    }
+
+    /**
+     * رسم جميع خطوط SVG المنحنية بين الأزواج المتطابقة
+     * @param {boolean} animateLatest - تفعيل حركة الرسم للخط الأخير فقط
+     * @param {string|null} latestId - معرف الزوج الأخير
+     */
+    function drawAllMatchLines(animateLatest = false, latestId = null) {
+      const svg = document.getElementById('matching-svg');
+      const stage = document.getElementById('matching-stage');
+      if (!svg || !stage || appState.currentView !== 'matching') return;
+
+      const stageRect = stage.getBoundingClientRect();
+      if (stageRect.width === 0) return;
+
+      svg.innerHTML = '';
+      const roundItems = MATCHING_ROUNDS[matchGame.roundIndex];
+
+      matchGame.matchedIds.forEach(id => {
+        const dotWord = document.getElementById(`dot-word-${id}`);
+        const dotIcon = document.getElementById(`dot-icon-${id}`);
+        if (!dotWord || !dotIcon) return;
+
+        const wRect = dotWord.getBoundingClientRect();
+        const iRect = dotIcon.getBoundingClientRect();
+
+        // حساب مركز كل نقطة بالنسبة لحاوية ساحة التوصيل
+        const x1 = wRect.left + wRect.width / 2 - stageRect.left;
+        const y1 = wRect.top + wRect.height / 2 - stageRect.top;
+        const x2 = iRect.left + iRect.width / 2 - stageRect.left;
+        const y2 = iRect.top + iRect.height / 2 - stageRect.top;
+
+        // نقاط التحكم لمنحنى Bezier سلس وأنيق
+        const dx = Math.abs(x1 - x2) * 0.45;
+        const cx1 = x1 - dx;
+        const cx2 = x2 + dx;
+
+        const itemData = roundItems.find(item => item.id === id);
+        const strokeColor = itemData ? itemData.color : '#2EC4B6';
+
+        // خط أبيض سفلي خفيف لإبراز اللون فوق الخلفية
+        const shadowPath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+        shadowPath.setAttribute('d', `M ${x1} ${y1} C ${cx1} ${y1}, ${cx2} ${y2}, ${x2} ${y2}`);
+        shadowPath.setAttribute('fill', 'none');
+        shadowPath.setAttribute('stroke', '#ffffff');
+        shadowPath.setAttribute('stroke-width', '9');
+        shadowPath.setAttribute('stroke-linecap', 'round');
+        svg.appendChild(shadowPath);
+
+        // الخط الملون الأساسي
+        const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+        path.setAttribute('d', `M ${x1} ${y1} C ${cx1} ${y1}, ${cx2} ${y2}, ${x2} ${y2}`);
+        path.setAttribute('fill', 'none');
+        path.setAttribute('stroke', strokeColor);
+        path.setAttribute('stroke-width', '5');
+        path.setAttribute('stroke-linecap', 'round');
+        if (animateLatest && id === latestId) {
+          path.classList.add('svg-line-draw');
+        }
+        svg.appendChild(path);
+      });
+    }
+
+    // إعادة حساب خطوط SVG عند تغيير حجم الشاشة أو تدوير الجهاز
+    window.addEventListener('resize', () => {
+      if (appState.currentView === 'matching') {
+        requestAnimationFrame(() => drawAllMatchLines(false));
+      }
+    });
+
+    // مراقبة تغير أبعاد ساحة التوصيل لضمان دقة الخطوط دائماً
+    try {
+      const stageObserver = new ResizeObserver(() => {
+        if (appState.currentView === 'matching') {
+          drawAllMatchLines(false);
+        }
+      });
+      stageObserver.observe(document.getElementById('matching-stage'));
+    } catch (e) {
+      // في حال عدم دعم ResizeObserver يكفي مستمع resize
+    }
+
+    // =========================================================================
+    // 5. شاشة الاحتفال ومؤثرات المفرقعات (Canvas Confetti)
+    // =========================================================================
+    function showCompletionScreen({ score, total, subtitle }) {
+      const ratio = score / total;
+      const earnedStars = ratio >= 0.8 ? 3 : ratio >= 0.5 ? 2 : 1;
+
+      // إضافة النجوم لمجموع الجلسة
+      appState.totalStars += earnedStars;
+      updateStarsUI();
+
+      // تحديث نصوص شاشة النتائج
+      document.getElementById('result-subtitle').textContent = subtitle;
+      document.getElementById('result-score-text').textContent = `${score} / ${total}`;
+      document.getElementById('result-earned-stars').textContent = `+${earnedStars} ⭐`;
+
+      // عرض النجوم الثلاث بتأثير حركي متتابع
+      const starsContainer = document.getElementById('result-stars');
+      starsContainer.innerHTML = '';
+      for (let i = 1; i <= 3; i++) {
+        const starSpan = document.createElement('span');
+        const isFilled = i <= earnedStars;
+        starSpan.className = `text-5xl sm:text-6xl opacity-0 animate-star-pop ${isFilled ? 'drop-shadow-md' : 'grayscale opacity-30'}`;
+        starSpan.style.animationDelay = `${i * 0.18}s`;
+        starSpan.textContent = '⭐';
+        starsContainer.appendChild(starSpan);
+      }
+
+      navigateTo('complete');
+      SoundFX.playFanfare();
+      launchCelebrationConfetti();
+    }
+
+    /** إعادة تشغيل آخر اختبار تم لعبه */
+    function replayCurrentExam() {
+      if (appState.lastExam === 'animals') {
+        startAnimalQuiz();
+      } else {
+        startMatchingGame();
+      }
+    }
+
+    /** فرقعة صغيرة مبهجة عند كل إجابة صحيحة */
+    function triggerMiniConfetti() {
+      try {
+        if (typeof confetti !== 'function') return;
+        confetti({
+          particleCount: 28,
+          spread: 55,
+          origin: { y: 0.72 },
+          colors: ['#FF6B6B', '#FFD93D', '#2EC4B6', '#4D96FF', '#845EC2'],
+          disableForReducedMotion: true
+        });
+      } catch (err) {
+        console.warn('Confetti error:', err);
+      }
+    }
+
+    /** احتفالية مفرقعات غنية متعددة الدفعات (مدافع جانبية + انفجار نجمي في المنتصف) */
+    function launchCelebrationConfetti() {
+      try {
+        if (typeof confetti !== 'function') return;
+        const colors = ['#FF6B6B', '#FFD93D', '#2EC4B6', '#4D96FF', '#845EC2'];
+
+        // انفجار نجمي في المنتصف
+        confetti({
+          particleCount: 70,
+          spread: 100,
+          origin: { y: 0.55 },
+          colors,
+          shapes: ['star', 'circle'],
+          scalar: 1.15
+        });
+
+        // مدافع جانبية متتابعة من اليمين واليسار
+        const duration = 1800;
+        const end = Date.now() + duration;
+
+        (function frame() {
+          confetti({
+            particleCount: 5,
+            angle: 60,
+            spread: 55,
+            origin: { x: 0, y: 0.65 },
+            colors
+          });
+          confetti({
+            particleCount: 5,
+            angle: 120,
+            spread: 55,
+            origin: { x: 1, y: 0.65 },
+            colors
+          });
+
+          if (Date.now() < end) {
+            requestAnimationFrame(frame);
+          }
+        })();
+      } catch (err) {
+        console.warn('Confetti celebration error:', err);
+      }
+    }
+  </script>
+</body>
+</html>
